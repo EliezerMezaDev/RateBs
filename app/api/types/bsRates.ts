@@ -12,3 +12,9 @@ export interface BsRates {
   promedio: number;
   fechaActualizacion: string;
 }
+
+export interface ProcessedRate {
+  rate: number;
+  lastUpdate: string;
+  source : RatesSource;
+}

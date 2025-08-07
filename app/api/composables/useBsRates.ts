@@ -1,10 +1,5 @@
-import { RatesSource } from "../types/bsRates";
+import { RatesSource, type ProcessedRate } from "../types/bsRates";
 import { useApi } from "./useApi";
-
-export interface ProcessedRate {
-  rate: number;
-  lastUpdate: string;
-}
 
 export const useBsRates = () => {
   const { getBsRate } = useApi();
@@ -47,11 +42,13 @@ export const useBsRates = () => {
       const bcvRate: ProcessedRate = {
         rate: bcvRaw.promedio,
         lastUpdate: bcvRaw.fechaActualizacion,
+        source: RatesSource.Oficial,
       };
 
       const streetRate: ProcessedRate = {
         rate: streetRaw.promedio,
         lastUpdate: streetRaw.fechaActualizacion,
+        source: RatesSource.Paralelo,
       };
 
       const relationship = streetRate.rate / bcvRate.rate;

@@ -1,7 +1,5 @@
 <template>
   <div class="realtive w-full min-h-screen h-auto flex flex-col">
-    <CommonHeader />
-    
     <main class="w-full flex flex-col items-center justify-start">
       <slot />
     </main>

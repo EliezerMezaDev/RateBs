@@ -1,0 +1,67 @@
+<script setup lang="ts">
+import type { PropType } from "vue";
+import { useClipboard } from "@vueuse/core";
+import { RatesSource, type ProcessedRate } from "~/api/types/bsRates";
+
+const props = defineProps({
+  rateData: {
+    type: Object as PropType<ProcessedRate | null>,
+    required: true,
+  },
+});
+
+const { copy, copied } = useClipboard({
+  source: () => props.rateData?.rate.toString() || "",
+  legacy: true,
+});
+
+const formatCurrency = (value: number) => {
+  if (value === undefined || value === null) return "...";
+  return value.toLocaleString("es-VE", { style: "currency", currency: "VES" });
+};
+
+const formatDate = (dateString: string) => {
+  if (!dateString) return "...";
+  return new Date(dateString).toLocaleDateString("es-VE", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+};
+</script>
+
+<template>
+  <div class="w-full text-center">
+    <h2 class="text-start text-md font-medium text-light/50">
+      {{
+        rateData?.source === RatesSource.Oficial
+          ? "Tasa Oficial (BCV)"
+          : "Tasa Paralela"
+      }}
+    </h2>
+
+    <div v-if="rateData" class="flex justify-start items-center gap-2">
+      <p class="mb-2 text-2xl font-extrabold text-light">
+        {{ formatCurrency(rateData.rate) }}
+      </p>
+
+      <button
+        @click="copy()"
+        class="rounded-full transition-all duration-200"
+        :aria-label="copied ? 'Copiado' : 'Copiar tasa'"
+      >
+        <Icon
+          :name="!copied ? 'ic:round-content-copy' : 'ic:round-check'"
+          class="text-2xl "
+          :class="!copied ? 'text-primary/90' : 'text-green-400'"
+        />
+      </button>
+    </div>
+
+    <p v-if="rateData" class="mb-2 text-end text-sm font-light text-light/50">
+      Actualizado:
+      <b class="text-light font-bold">{{ formatDate(rateData.lastUpdate) }}</b>
+    </p>
+
+    <div class="w-full h-[2px] bg-light/10" />
+  </div>
+</template>
