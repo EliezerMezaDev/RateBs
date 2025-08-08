@@ -36,22 +36,44 @@ useHead({
       Ocurrió un error al procesar las tasas.
     </div>
 
-    <div v-else class="w-full grow grid grid-cols-5 grid-rows-5 gap-8 p-8">
-      <div
-        class="card col-span-2 row-span-5 flex flex-col items-center justify-start gap-2"
-      >
-        <HomeRateCard :rateData="data.bcvRate" />
-        <HomeRateCard :rateData="data.streetRate" />
+    <div
+      v-else
+      class="w-full h-full grow grid grid-cols-4 grid-rows-5 gap-4 p-8"
+    >
+      <div class="card row-span-5 flex flex-col justify-between gap-4 p-4">
+        <div class="flex flex-col gap-4">
+          <HomeRateCard :rateData="data.bcvRate" />
+          <HomeRateCard :rateData="data.streetRate" />
+        </div>
+
+        <div>
+          <HomeRateRelationship
+            :officialRate="data.bcvRate"
+            :parallelRate="data.streetRate"
+          />
+        </div>
       </div>
 
-      <div class="card col-span-3 row-span-5 col-start-3">2</div>
+      <div class="card col-span-3 row-span-5 p-4">
+        <HomeRateCalculator
+          :bcvRate="data.bcvRate"
+          :streetRate="data.streetRate"
+        />
+      </div>
     </div>
   </CommonSection>
 </template>
 
 <style>
 .card {
-  @apply flex font-bold text-white rounded-2xl p-6 text-center;
-  @apply bg-white/10 backdrop-blur-lg border border-white/20 shadow-xl;
+  @apply font-bold text-white rounded-2xl h-full w-full;
+
+  @apply bg-white/10;
+
+  @apply backdrop-blur-md;
+
+  @apply border border-white/20;
+
+  @apply shadow-xl;
 }
 </style>
