@@ -29,36 +29,29 @@ useHead({
       Ocurrió un error al procesar las tasas.
     </div>
 
-    <div
-      v-else-if="error || !data || !data.bcvRate"
-      class="text-red-400 text-2xl"
-    >
-      Ocurrió un error al procesar las tasas.
-    </div>
-
-    <div
-      v-else
-      class="w-full h-full grow grid grid-cols-4 grid-rows-5 gap-4 p-8"
-    >
-      <div class="card row-span-5 flex flex-col justify-between gap-4 p-4">
-        <div class="flex flex-col gap-4">
-          <HomeRateCard :rateData="data.bcvRate" />
-          <HomeRateCard :rateData="data.streetRate" />
+    <div v-else class="w-full grow p-4 sm:p-6 md:p-8">
+      <div class="flex flex-col lg:grid lg:grid-cols-3 gap-6 h-full">
+        <div
+          class="card flex max-[425px]:flex-col lg:flex-col max-[425px]:items-center items-start justify-between gap-4 p-4"
+        >
+          <div class="flex flex-col gap-4">
+            <HomeRateCard :rateData="data.bcvRate" />
+            <HomeRateCard :rateData="data.streetRate" />
+          </div>
+          <div>
+            <HomeRateRelationship
+              :officialRate="data.bcvRate"
+              :parallelRate="data.streetRate"
+            />
+          </div>
         </div>
 
-        <div>
-          <HomeRateRelationship
-            :officialRate="data.bcvRate"
-            :parallelRate="data.streetRate"
+        <div class="card lg:col-span-2">
+          <HomeInteractivePanel
+            :bcvRate="data.bcvRate"
+            :streetRate="data.streetRate"
           />
         </div>
-      </div>
-
-      <div class="card col-span-3 row-span-5 p-4">
-        <HomeInteractivePanel
-          :bcvRate="data.bcvRate"
-          :streetRate="data.streetRate"
-        />
       </div>
     </div>
   </CommonSection>
@@ -66,14 +59,7 @@ useHead({
 
 <style>
 .card {
-  @apply font-bold text-white rounded-2xl h-full w-full;
-
-  @apply bg-white/10;
-
-  @apply backdrop-blur-md;
-
-  @apply border border-white/20;
-
-  @apply shadow-xl;
+  @apply font-bold text-white rounded-2xl w-full;
+  @apply bg-white/10 backdrop-blur-md border border-white/20 shadow-xl;
 }
 </style>

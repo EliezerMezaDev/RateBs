@@ -45,14 +45,18 @@ watch(vesOfficialValue, (newVes: number | null) => {
   if (
     areValuesLocked.value ||
     lastEdited.value !== "vesOfficial" ||
-    !props.bcvRate
+    !props.bcvRate ||
+    !props.streetRate
   )
     return;
 
   if (newVes !== null) {
-    usdValue.value = roundValue(newVes / props.bcvRate.rate, 4);
+    const newUsd = roundValue(newVes / props.bcvRate.rate, 4);
+    usdValue.value = newUsd;
+    vesStreetValue.value = roundValue(newUsd * props.streetRate.rate);
   } else {
     usdValue.value = null;
+    vesStreetValue.value = null;
   }
 });
 
@@ -60,24 +64,30 @@ watch(vesStreetValue, (newVes: number | null) => {
   if (
     areValuesLocked.value ||
     lastEdited.value !== "vesStreet" ||
+    !props.bcvRate ||
     !props.streetRate
   )
     return;
 
   if (newVes !== null) {
-    usdValue.value = roundValue(newVes / props.streetRate.rate, 4);
+    const newUsd = roundValue(newVes / props.streetRate.rate, 4);
+    usdValue.value = newUsd;
+    vesOfficialValue.value = roundValue(newUsd * props.bcvRate.rate);
   } else {
     usdValue.value = null;
+    vesOfficialValue.value = null;
   }
 });
 </script>
 
 <template>
-  <div v-if="bcvRate && streetRate" class="w-full h-full flex flex-col gap-4">
-    <div class="flex gap-4">
+  <div
+    v-if="bcvRate && streetRate"
+    class="w-full h-full flex flex-col justify-between"
+  >
+    <div class="flex flex-col md:flex-row gap-4">
       <div class="input-card">
         <label for="usd-input" class="input-label">Precio en Divisas</label>
-
         <div class="input-wrapper">
           <span class="input-prefix">$</span>
           <input
@@ -85,7 +95,7 @@ watch(vesStreetValue, (newVes: number | null) => {
             type="number"
             class="input-field placeholder:text-primary"
             placeholder="1.00"
-            step="0.01"
+            step="any"
             v-model.number="usdValue"
             @focus="lastEdited = 'usd'"
           />
@@ -104,7 +114,7 @@ watch(vesStreetValue, (newVes: number | null) => {
             type="number"
             class="input-field"
             placeholder="0.00"
-            step="0.01"
+            step="any"
             v-model.number="vesOfficialValue"
             @focus="lastEdited = 'vesOfficial'"
           />
@@ -116,7 +126,6 @@ watch(vesStreetValue, (newVes: number | null) => {
 
       <div class="input-card">
         <label for="street-input" class="input-label">Tasa Paralela</label>
-
         <div class="input-wrapper" :class="{ 'is-locked': areValuesLocked }">
           <span class="input-prefix">Bs</span>
           <input
@@ -125,7 +134,7 @@ watch(vesStreetValue, (newVes: number | null) => {
             type="number"
             class="input-field"
             placeholder="0.00"
-            step="0.1"
+            step="any"
             v-model.number="vesStreetValue"
             @focus="lastEdited = 'vesStreet'"
           />
@@ -136,12 +145,14 @@ watch(vesStreetValue, (newVes: number | null) => {
       </div>
     </div>
 
-    <label class="flex items-center gap-3 cursor-pointer text-sm self-start">
+    <label
+      class="flex items-center gap-3 cursor-pointer text-sm self-start mt-4"
+    >
       <input
         type="checkbox"
         :checked="!areValuesLocked"
         @change="areValuesLocked = !areValuesLocked"
-        class="form-checkbox h-5 w-5 rounded bg-white/20 text-green-400 border-none focus:ring-green-400"
+        class="form-checkbox h-5 w-5 rounded bg-light/20 text-green-400 border-none focus:ring-green-400"
       />
       <span class="font-medium">Habilitar cálculo multidireccional</span>
     </label>
@@ -155,26 +166,21 @@ watch(vesStreetValue, (newVes: number | null) => {
 }
 
 .input-label {
-  @apply text-start font-medium text-light/50;
+  @apply text-start font-medium text-xs text-light/50;
 }
-
 .input-wrapper {
   @apply flex items-center;
 }
-
 .input-wrapper.is-locked {
   @apply bg-transparent;
 }
-
 .input-prefix {
-  @apply pr-2 text-light/50 font-mono text-xl;
+  @apply pr-2 text-light/50 font-mono text-lg md:text-xl;
 }
-
 .input-field,
 .input-display {
-  @apply w-full bg-transparent  text-light focus:text-primary text-2xl font-semibold focus:outline-none;
+  @apply w-full bg-transparent text-light focus:text-green-400 text-xl md:text-2xl font-semibold focus:outline-none;
 }
-
 .input-display {
   @apply select-none p-0;
 }
