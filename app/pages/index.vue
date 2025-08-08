@@ -55,7 +55,7 @@ useHead({
       </div>
 
       <div class="card col-span-3 row-span-5 p-4">
-        <HomeRateCalculator
+        <HomeInteractivePanel
           :bcvRate="data.bcvRate"
           :streetRate="data.streetRate"
         />

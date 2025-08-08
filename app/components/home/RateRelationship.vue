@@ -65,7 +65,7 @@ const absoluteDifference = computed(() => {
     </div>
 
     <div class="flex items-center gap-3">
-      <Icon name="ic:round-calculate" class="text-3xl text-primary/80" />
+      <Icon name="ic:round-difference" class="text-3xl text-primary/80" />
       <div>
         <h3 class="text-sm font-medium text-light/60">Diferencia Absoluta</h3>
         <p class="text-xl font-bold text-light">{{ absoluteDifference }}</p>

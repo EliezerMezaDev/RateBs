@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { ref, watch } from "vue";
-import type { PropType } from "vue";
 import type { ProcessedRate } from "~/api/types/bsRates";
 import { formatCurrency, roundValue } from "~/utils/formatters";
 
@@ -24,7 +22,7 @@ const lastEdited = ref<LastEditedField>("usd");
 
 watch(
   usdValue,
-  (newUsd) => {
+  (newUsd: number | null) => {
     if (
       (!areValuesLocked.value && lastEdited.value !== "usd") ||
       !props.bcvRate ||
@@ -43,7 +41,7 @@ watch(
   { immediate: true }
 );
 
-watch(vesOfficialValue, (newVes) => {
+watch(vesOfficialValue, (newVes: number | null) => {
   if (
     areValuesLocked.value ||
     lastEdited.value !== "vesOfficial" ||
@@ -58,7 +56,7 @@ watch(vesOfficialValue, (newVes) => {
   }
 });
 
-watch(vesStreetValue, (newVes) => {
+watch(vesStreetValue, (newVes: number | null) => {
   if (
     areValuesLocked.value ||
     lastEdited.value !== "vesStreet" ||
@@ -150,7 +148,7 @@ watch(vesStreetValue, (newVes) => {
   </div>
 </template>
 
-<style scoped>
+<style>
 .input-card {
   @apply rounded-lg flex flex-1 flex-col gap-2;
   @apply border border-transparent transition-all duration-200;
