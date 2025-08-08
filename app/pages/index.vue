@@ -32,14 +32,14 @@ useHead({
     <div v-else class="w-full grow p-4 sm:p-6 md:p-8">
       <div class="flex flex-col lg:grid lg:grid-cols-3 gap-6 h-full">
         <div
-          class="card flex max-[425px]:flex-col lg:flex-col max-[425px]:items-center items-start justify-between gap-4 p-4"
+          class="card flex max-[425px]:flex-col lg:flex-col max-[425px]:items-center items-start justify-between gap-20 p-4"
         >
           <div class="flex flex-col gap-4">
-            <HomeRateCard :rateData="data.bcvRate" />
-            <HomeRateCard :rateData="data.streetRate" />
+            <HomeCalculatorRateCard :rateData="data.bcvRate" />
+            <HomeCalculatorRateCard :rateData="data.streetRate" />
           </div>
           <div>
-            <HomeRateRelationship
+            <HomeCalculatorRateRelationship
               :officialRate="data.bcvRate"
               :parallelRate="data.streetRate"
             />

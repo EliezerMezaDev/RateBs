@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { ProcessedRate } from "~/api/types/bsRates";
 
-defineProps({
+const props = defineProps({
   bcvRate: {
     type: Object as PropType<ProcessedRate | null>,
     required: true,
@@ -16,25 +16,32 @@ const tabs = [
   { id: "calculator", label: "Calculadora", icon: "ic:round-calculate" },
   { id: "settings", label: "Configuración", icon: "ic:round-settings" },
 ];
-
 const activeTab = ref(tabs[0]!.id);
+
+const managedBcvRate = ref<ProcessedRate | null>(null);
+const managedStreetRate = ref<ProcessedRate | null>(null);
+
+watch(
+  [() => props.bcvRate, () => props.streetRate],
+  ([newBcv, newStreet]: any) => {
+    if (newBcv) managedBcvRate.value = { ...newBcv };
+    if (newStreet) managedStreetRate.value = { ...newStreet };
+  },
+  { immediate: true, deep: true }
+);
+
+function handleRatesUpdate(newRates: { bcv: number; street: number }) {
+  if (managedBcvRate.value) {
+    managedBcvRate.value = { ...managedBcvRate.value, rate: newRates.bcv };
+  }
+  if (managedStreetRate.value) {
+    managedStreetRate.value = { ...managedStreetRate.value, rate: newRates.street };
+  }
+}
 </script>
 
 <template>
   <div class="flex flex-col h-full">
-    <div class="sm:hidden mb-4">
-      <label for="tabs-mobile" class="sr-only">Seleccionar Pestaña</label>
-      <select
-        id="tabs-mobile"
-        v-model="activeTab"
-        class="w-full p-3 rounded-lg bg-white/10 border border-white/20 text-light focus:ring-primary focus:border-primary"
-      >
-        <option v-for="tab in tabs" :key="tab.id" :value="tab.id">
-          {{ tab.label }}
-        </option>
-      </select>
-    </div>
-
     <ul
       class="hidden text-center text-lg lg:text-xl font-medium text-light sm:flex"
     >
@@ -44,8 +51,8 @@ const activeTab = ref(tabs[0]!.id);
           @click.prevent="activeTab = tab.id"
           class="w-full p-3 lg:p-4 transition-colors duration-200 flex items-center justify-center gap-2"
           :class="{
-            'bg-light/5 rounded-t-lg': activeTab === tab.id,
-            'text-light/70 hover:text-light':
+            'bg-white/10 rounded-t-lg': activeTab === tab.id,
+            'text-light/70 hover:bg-white/5 hover:text-light':
               activeTab !== tab.id,
           }"
         >
@@ -54,23 +61,19 @@ const activeTab = ref(tabs[0]!.id);
         </a>
       </li>
     </ul>
-
-    <div class="pt-2 px-4 bg-light/5 rounded-b-lg grow">
+    <div class="p-2 sm:p-4 bg-white/10 rounded-b-lg grow">
       <div v-show="activeTab === 'calculator'">
-        <HomeRateCalculator :bcvRate="bcvRate" :streetRate="streetRate" />
-      </div>
-
-      <div
-        v-show="activeTab === 'settings'"
-        class="flex flex-col items-center justify-center h-full"
-      >
-        <Icon
-          name="ic:round-construction"
-          class="text-5xl sm:text-6xl text-light/30"
+        <HomeCalculatorSimpleMode
+          :bcvRate="managedBcvRate"
+          :streetRate="managedStreetRate"
         />
-        <p class="text-light/50 mt-2">
-          Sección de Configuración en construcción.
-        </p>
+      </div>
+      <div v-show="activeTab === 'settings'">
+        <HomeSettingsPanel
+          :currentBcvRate="managedBcvRate"
+          :currentStreetRate="managedStreetRate"
+          @update:rates="handleRatesUpdate"
+        />
       </div>
     </div>
   </div>
