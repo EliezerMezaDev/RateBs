@@ -16,7 +16,7 @@ useHead({
 </script>
 
 <template>
-  <CommonSection customClass="items-stretch">
+  <CommonSection customClass="items-stretch h-auto">
     <div v-if="pending" class="flex justify-center items-center h-full">
       <CommonLoader label="Calculando tasas..." />
     </div>
@@ -30,16 +30,16 @@ useHead({
     </div>
 
     <div v-else class="w-full grow p-4 sm:p-6 md:p-8">
-      <div class="flex flex-col lg:grid lg:grid-cols-3 gap-6 h-full">
+      <div class="flex flex-col lg:grid lg:grid-cols-3 gap-6 max-h-full">
         <div
           class="card flex max-[425px]:flex-col lg:flex-col max-[425px]:items-center items-start justify-between gap-20 p-4"
         >
-          <div class="flex flex-col gap-4">
-            <HomeCalculatorRateCard :rateData="data.bcvRate" />
-            <HomeCalculatorRateCard :rateData="data.streetRate" />
+          <div class="w-full flex flex-col gap-4">
+            <HomeRateCard :rateData="data.bcvRate" />
+            <HomeRateCard :rateData="data.streetRate" />
           </div>
-          <div>
-            <HomeCalculatorRateRelationship
+          <div class="w-full flex max-lg:justify-end">
+            <HomeRateRelationship
               :officialRate="data.bcvRate"
               :parallelRate="data.streetRate"
             />
@@ -59,7 +59,7 @@ useHead({
 
 <style>
 .card {
-  @apply font-bold text-white rounded-2xl w-full;
-  @apply bg-white/10 backdrop-blur-md border border-white/20 shadow-xl;
+  @apply font-bold text-white rounded-2xl w-full overflow-hidden;
+  @apply bg-dark border border-light/20 backdrop-blur-md shadow-xl;
 }
 </style>

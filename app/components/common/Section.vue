@@ -19,7 +19,11 @@ const props = defineProps({
   },
 });
 
-const svgBg = `url("data:image/svg+xml,<svg id='patternId' width='100%' height='100%' xmlns='http://www.w3.org/2000/svg'><defs><pattern id='a' patternUnits='userSpaceOnUse' width='29' height='50.115' patternTransform='scale(2) rotate(10)'><rect x='0' y='0' width='100%' height='100%' fill='%23002d4bff'/><path d='M14.498 16.858L0 8.488.002-8.257l14.5-8.374L29-8.26l-.002 16.745zm0 50.06L0 58.548l.002-16.745 14.5-8.373L29 41.8l-.002 16.744zM28.996 41.8l-14.498-8.37.002-16.744L29 8.312l14.498 8.37-.002 16.745zm-29 0l-14.498-8.37.002-16.744L0 8.312l14.498 8.37-.002 16.745z'  stroke-width='2' stroke='%23003459ff' fill='none'/></pattern></defs><rect width='800%' height='800%' transform='translate(-4,-32)' fill='url(%23a)'/></svg>")`;
+const svgBg = `url("data:image/svg+xml,<svg id='patternId' width='100%' height='100%' xmlns='http://www.w3.org/2000/svg'><defs><pattern id='a' patternUnits='userSpaceOnUse' width='40' height='40' patternTransform='scale(1) rotate(60)'><rect x='0' y='0' width='100%' height='100%' fill='%23002d4bff'/><path d='M15.986 4.186 4.1 16.072v.58L16.566 4.186Zm7.62 0 12.38 12.38v-.58l-11.8-11.8Zm12.38 19.248L23.52 35.9h.58l11.886-11.886ZM4.1 23.52v.58l11.8 11.8h.58z'  stroke-linejoin='round' stroke-linecap='round' stroke-width='0.5' stroke='%2300a8e8ff' fill='none'/></pattern></defs><rect width='800%' height='800%' transform='translate(0,0)' fill='url(%23a)'/></svg>")`;
+
+
+
+
 
 const sectionClasses = computed(() => {
   const baseClasses =

@@ -94,6 +94,6 @@ function handleUpdate() {
   @apply pr-2 text-light/50 font-mono text-lg md:text-xl;
 }
 .input-field {
-  @apply w-full bg-transparent text-light focus:text-green-400 text-xl md:text-2xl font-semibold focus:outline-none;
+  @apply w-full bg-transparent text-light focus:text-white text-xl md:text-2xl font-semibold focus:outline-none;
 }
 </style>

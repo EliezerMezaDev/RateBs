@@ -43,7 +43,7 @@ const { copy, copied } = useClipboard({
       </button>
     </div>
 
-    <p v-if="rateData" class="text-start text-xs sm:text-sm font-light text-light/50">
+    <p v-if="rateData" class="text-end lg:text-start text-xs sm:text-sm font-light text-light/50">
       Actualizado:
       <b class="text-light font-bold">{{ formatDate(rateData.lastUpdate) }}</b>
     </p>
