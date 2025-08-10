@@ -111,7 +111,7 @@ watch(vesStreetValue, (newVes: number | null) => {
   <div class="flex flex-col gap-4">
     <div class="flex flex-col md:flex-row gap-4">
       <div class="input-card highlight-card">
-        <label for="usd-input" class="input-label">Precio en divisas</label>
+        <label for="usd-input" class="input-label">Monto en divisas</label>
         <div class="input-wrapper">
           <span class="input-prefix">$</span>
           <input
@@ -125,9 +125,9 @@ watch(vesStreetValue, (newVes: number | null) => {
           />
         </div>
       </div>
-      <div class="input-card">
+      <div class="input-card highlight-card">
         <label for="official-input" class="input-label"
-          >Tasa oficial (BCV)</label
+          >Monto en bolívares (BCV)</label
         >
         <div class="input-wrapper">
           <span class="input-prefix">Bs</span>
@@ -142,8 +142,8 @@ watch(vesStreetValue, (newVes: number | null) => {
           />
         </div>
       </div>
-      <div class="input-card">
-        <label for="street-input" class="input-label">Tasa paralela</label>
+      <div class="input-card highlight-card">
+        <label for="street-input" class="input-label">Monto en bolívares (Paralelo)</label>
         <div class="input-wrapper">
           <span class="input-prefix">Bs</span>
           <input
