@@ -37,11 +37,14 @@ useHead({
           <div class="w-full flex flex-col gap-4">
             <HomeRateCard :rateData="data.bcvRate" />
             <HomeRateCard :rateData="data.streetRate" />
+
+            <HomeRateCard :rateData="data.binanceRate" />
           </div>
           <div class="w-full flex max-lg:justify-end">
             <HomeRateRelationship
               :officialRate="data.bcvRate"
               :parallelRate="data.streetRate"
+              :binanceRate="data.binanceRate"
             />
           </div>
         </div>
@@ -50,6 +53,7 @@ useHead({
           <HomeInteractivePanel
             :bcvRate="data.bcvRate"
             :streetRate="data.streetRate"
+            :binanceRate="data.binanceRate"
           />
         </div>
       </div>
