@@ -24,30 +24,42 @@ type LastEditedField = "usd" | "vesOfficial" | "vesStreet" | "vesBinance";
 const lastEdited = ref<LastEditedField>("usd");
 
 const comparisonInfo = computed(() => {
-  if (vesOfficialValue.value === null) {
+  if (
+    vesOfficialValue.value === null ||
+    usdValue.value === null ||
+    !props.bcvRate
+  ) {
     return [];
   }
 
-  const baseAmount = vesOfficialValue.value;
+  const baseVesAmount = vesOfficialValue.value;
+  const baseUsdAmount = usdValue.value;
+  const bcvRateValue = props.bcvRate.rate;
   const comparisons = [];
 
   const ratesToCompare = [
-    { label: "BCV vs Paralelo", amount: vesStreetValue.value },
-    { label: "BCV vs Binance P2P", amount: vesBinanceValue.value },
+    { label: "vs Paralelo", amount: vesStreetValue.value },
+    { label: "vs Binance P2P", amount: vesBinanceValue.value },
   ];
 
   for (const item of ratesToCompare) {
     if (item.amount !== null) {
-      const absoluteDiff = item.amount - baseAmount;
+      const absoluteDiffVes = item.amount - baseVesAmount;
       const percentageDiff =
-        baseAmount !== 0 ? (absoluteDiff / baseAmount) * 100 : 0;
-      const isPositive = absoluteDiff >= 0;
+        baseVesAmount !== 0 ? (absoluteDiffVes / baseVesAmount) * 100 : 0;
+      const isPositive = absoluteDiffVes >= 0;
+
+      const bcvUsdEquivalent = item.amount / bcvRateValue;
+
+      const usdBenefit = bcvUsdEquivalent - baseUsdAmount;
 
       comparisons.push({
         label: item.label,
-        absoluteDiff: formatCurrency(absoluteDiff, "VES"),
+        absoluteDiff: formatCurrency(absoluteDiffVes, "VES"),
         percentageDiff: `${isPositive ? "+" : ""}${percentageDiff.toFixed(2)}%`,
         isPositive,
+
+        usdBenefit: formatCurrency(usdBenefit, "USD"),
       });
     }
   }
@@ -69,7 +81,6 @@ watch(
   },
   { deep: true }
 );
-
 watch(
   usdValue,
   (newUsd) => {
@@ -88,7 +99,6 @@ watch(
   },
   { immediate: true }
 );
-
 watch(vesOfficialValue, (newVes) => {
   if (lastEdited.value !== "vesOfficial" || !props.bcvRate || !props.streetRate)
     return;
@@ -104,16 +114,13 @@ watch(vesOfficialValue, (newVes) => {
     vesBinanceValue.value = null;
   }
 });
-
 watch(vesStreetValue, (newVes) => {
   if (lastEdited.value !== "vesStreet" || !props.bcvRate || !props.streetRate)
     return;
-
   if (newVes !== null) {
     const newUsd = roundValue(newVes / props.streetRate.rate, 4);
     usdValue.value = newUsd;
     vesOfficialValue.value = roundValue(newUsd * props.bcvRate.rate);
-    
     if (props.binanceRate)
       vesBinanceValue.value = roundValue(newUsd * props.binanceRate.rate);
   } else {
@@ -122,7 +129,6 @@ watch(vesStreetValue, (newVes) => {
     vesBinanceValue.value = null;
   }
 });
-
 watch(vesBinanceValue, (newVes) => {
   if (
     lastEdited.value !== "vesBinance" ||
@@ -215,20 +221,24 @@ watch(vesBinanceValue, (newVes) => {
       </div>
     </div>
 
-    <div class="flex gap-4">
-      <div
-        v-for="comp in comparisonInfo"
-        :key="comp.label"
-        class="info-item flex-1"
-      >
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div v-for="comp in comparisonInfo" :key="comp.label" class="info-item">
         <span class="info-label">{{ comp.label }}</span>
-        <div class="flex items-baseline gap-2 mt-1">
-          <span class="info-value text-light">{{ comp.absoluteDiff }}</span>
+        <div class="flex flex-col gap-1 mt-1">
+          <span class="text-xs text-light/80">
+            {{ comp.absoluteDiff }}
+            <span
+              :class="comp.isPositive ? 'text-red-400/80' : 'text-green-400/80'"
+            >
+              ({{ comp.percentageDiff }})
+            </span>
+          </span>
+
           <span
-            class="text-xs font-medium"
-            :class="comp.isPositive ? 'text-red-400/80' : 'text-green-400/80'"
+            class="info-value"
+            :class="comp.isPositive ? 'text-green-400' : 'text-red-400'"
           >
-            ({{ comp.percentageDiff }})
+            {{ comp.usdBenefit }}
           </span>
         </div>
       </div>
