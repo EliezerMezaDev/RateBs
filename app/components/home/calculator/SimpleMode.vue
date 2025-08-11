@@ -5,104 +5,147 @@ import type { ProcessedRate } from "~/api/types/bsRates";
 import { formatCurrency, roundValue } from "~/utils/formatters";
 
 const props = defineProps({
-  bcvRate: {
-    type: Object as PropType<ProcessedRate | null>,
-    required: true,
-  },
+  bcvRate: { type: Object as PropType<ProcessedRate | null>, required: true },
   streetRate: {
     type: Object as PropType<ProcessedRate | null>,
     required: true,
+  },
+  binanceRate: {
+    type: Object as PropType<ProcessedRate | null>,
+    required: false,
   },
 });
 
 const usdValue = ref<number | null>(1);
 const vesOfficialValue = ref<number | null>(null);
 const vesStreetValue = ref<number | null>(null);
-type LastEditedField = "usd" | "vesOfficial" | "vesStreet";
+const vesBinanceValue = ref<number | null>(null);
+type LastEditedField = "usd" | "vesOfficial" | "vesStreet" | "vesBinance";
 const lastEdited = ref<LastEditedField>("usd");
 
 const comparisonInfo = computed(() => {
-  if (vesOfficialValue.value === null || vesStreetValue.value === null) {
-    return {
-      absoluteDiff: 0,
-      percentageDiff: 0,
-      isPositive: true,
-    };
+  if (
+    vesOfficialValue.value === null ||
+    usdValue.value === null ||
+    !props.bcvRate
+  ) {
+    return [];
   }
 
-  const officialAmount = vesOfficialValue.value;
-  const streetAmount = vesStreetValue.value;
+  const baseVesAmount = vesOfficialValue.value;
+  const baseUsdAmount = usdValue.value;
+  const bcvRateValue = props.bcvRate.rate;
+  const comparisons = [];
 
-  const absoluteDiff = streetAmount - officialAmount;
-  let percentageDiff = 0;
+  const ratesToCompare = [
+    { label: "vs Paralelo", amount: vesStreetValue.value },
+    { label: "vs Binance P2P", amount: vesBinanceValue.value },
+  ];
 
-  if (lastEdited.value === "vesOfficial" && officialAmount !== 0) {
-    percentageDiff = (streetAmount - officialAmount) / officialAmount;
-  } else if (lastEdited.value === "vesStreet" && streetAmount !== 0) {
-    percentageDiff = (officialAmount - streetAmount) / streetAmount;
-  } else if (lastEdited.value === "usd" && officialAmount !== 0) {
-    percentageDiff = (streetAmount - officialAmount) / officialAmount;
+  for (const item of ratesToCompare) {
+    if (item.amount !== null) {
+      const absoluteDiffVes = item.amount - baseVesAmount;
+      const percentageDiff =
+        baseVesAmount !== 0 ? (absoluteDiffVes / baseVesAmount) * 100 : 0;
+      const isPositive = absoluteDiffVes >= 0;
+
+      const bcvUsdEquivalent = item.amount / bcvRateValue;
+
+      const usdBenefit = bcvUsdEquivalent - baseUsdAmount;
+
+      comparisons.push({
+        label: item.label,
+        absoluteDiff: formatCurrency(absoluteDiffVes, "VES"),
+        percentageDiff: `${isPositive ? "+" : ""}${percentageDiff.toFixed(2)}%`,
+        isPositive,
+
+        usdBenefit: formatCurrency(usdBenefit, "USD"),
+      });
+    }
   }
 
-  const isPositive = percentageDiff >= 0;
-
-  return {
-    absoluteDiff,
-    percentageDiff,
-    isPositive,
-  };
+  return comparisons;
 });
 
 watch(
-  [() => props.bcvRate, () => props.streetRate],
+  [() => props.bcvRate, () => props.streetRate, () => props.binanceRate],
   () => {
     if (usdValue.value !== null && props.bcvRate && props.streetRate) {
       vesOfficialValue.value = roundValue(usdValue.value * props.bcvRate.rate);
       vesStreetValue.value = roundValue(usdValue.value * props.streetRate.rate);
+      if (props.binanceRate)
+        vesBinanceValue.value = roundValue(
+          usdValue.value * props.binanceRate.rate
+        );
     }
   },
   { deep: true }
 );
-
 watch(
   usdValue,
-  (newUsd: number | null) => {
+  (newUsd) => {
     if (lastEdited.value !== "usd" || !props.bcvRate || !props.streetRate)
       return;
     if (newUsd !== null) {
       vesOfficialValue.value = roundValue(newUsd * props.bcvRate.rate);
       vesStreetValue.value = roundValue(newUsd * props.streetRate.rate);
+      if (props.binanceRate)
+        vesBinanceValue.value = roundValue(newUsd * props.binanceRate.rate);
     } else {
       vesOfficialValue.value = null;
       vesStreetValue.value = null;
+      vesBinanceValue.value = null;
     }
   },
   { immediate: true }
 );
-
-watch(vesOfficialValue, (newVes: number | null) => {
+watch(vesOfficialValue, (newVes) => {
   if (lastEdited.value !== "vesOfficial" || !props.bcvRate || !props.streetRate)
     return;
   if (newVes !== null) {
     const newUsd = roundValue(newVes / props.bcvRate.rate, 4);
     usdValue.value = newUsd;
     vesStreetValue.value = roundValue(newUsd * props.streetRate.rate);
+    if (props.binanceRate)
+      vesBinanceValue.value = roundValue(newUsd * props.binanceRate.rate);
   } else {
     usdValue.value = null;
     vesStreetValue.value = null;
+    vesBinanceValue.value = null;
   }
 });
-
-watch(vesStreetValue, (newVes: number | null) => {
+watch(vesStreetValue, (newVes) => {
   if (lastEdited.value !== "vesStreet" || !props.bcvRate || !props.streetRate)
     return;
   if (newVes !== null) {
     const newUsd = roundValue(newVes / props.streetRate.rate, 4);
     usdValue.value = newUsd;
     vesOfficialValue.value = roundValue(newUsd * props.bcvRate.rate);
+    if (props.binanceRate)
+      vesBinanceValue.value = roundValue(newUsd * props.binanceRate.rate);
   } else {
     usdValue.value = null;
     vesOfficialValue.value = null;
+    vesBinanceValue.value = null;
+  }
+});
+watch(vesBinanceValue, (newVes) => {
+  if (
+    lastEdited.value !== "vesBinance" ||
+    !props.bcvRate ||
+    !props.streetRate ||
+    !props.binanceRate
+  )
+    return;
+  if (newVes !== null) {
+    const newUsd = roundValue(newVes / props.binanceRate.rate, 4);
+    usdValue.value = newUsd;
+    vesOfficialValue.value = roundValue(newUsd * props.bcvRate.rate);
+    vesStreetValue.value = roundValue(newUsd * props.streetRate.rate);
+  } else {
+    usdValue.value = null;
+    vesOfficialValue.value = null;
+    vesStreetValue.value = null;
   }
 });
 </script>
@@ -143,7 +186,9 @@ watch(vesStreetValue, (newVes: number | null) => {
         </div>
       </div>
       <div class="input-card highlight-card">
-        <label for="street-input" class="input-label">Monto en bolívares (Paralelo)</label>
+        <label for="street-input" class="input-label"
+          >Monto en bolívares (Paralelo)</label
+        >
         <div class="input-wrapper">
           <span class="input-prefix">Bs</span>
           <input
@@ -157,26 +202,45 @@ watch(vesStreetValue, (newVes: number | null) => {
           />
         </div>
       </div>
+      <div v-if="binanceRate" class="input-card highlight-card">
+        <label for="binance-input" class="input-label"
+          >Monto en bolívares (Binance)</label
+        >
+        <div class="input-wrapper">
+          <span class="input-prefix">Bs</span>
+          <input
+            id="binance-input"
+            type="number"
+            class="input-field"
+            placeholder="0.00"
+            step="any"
+            v-model.number="vesBinanceValue"
+            @focus="lastEdited = 'vesBinance'"
+          />
+        </div>
+      </div>
     </div>
 
-    <div class="flex gap-4">
-      <div class="info-item flex-1">
-        <span class="info-label">Diferencia (absoluta)</span>
-        <span class="info-value text-light">
-          {{ formatCurrency(comparisonInfo.absoluteDiff, "VES") }}
-        </span>
-      </div>
-      <div class="info-item flex-1">
-        <span class="info-label">Diferencia (%)</span>
-        <span
-          class="info-value"
-          :class="comparisonInfo.isPositive ? 'text-red-400' : 'text-green-400'"
-        >
-          {{
-            (comparisonInfo.isPositive ? "+" : "") +
-            (comparisonInfo.percentageDiff * 100).toFixed(2)
-          }}%
-        </span>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div v-for="comp in comparisonInfo" :key="comp.label" class="info-item">
+        <span class="info-label">{{ comp.label }}</span>
+        <div class="flex flex-col gap-1 mt-1">
+          <span class="text-xs text-light/80">
+            {{ comp.absoluteDiff }}
+            <span
+              :class="comp.isPositive ? 'text-red-400/80' : 'text-green-400/80'"
+            >
+              ({{ comp.percentageDiff }})
+            </span>
+          </span>
+
+          <span
+            class="info-value"
+            :class="comp.isPositive ? 'text-green-400' : 'text-red-400'"
+          >
+            {{ comp.usdBenefit }}
+          </span>
+        </div>
       </div>
     </div>
   </div>
@@ -199,7 +263,6 @@ watch(vesStreetValue, (newVes: number | null) => {
 .input-field {
   @apply w-full bg-transparent text-light focus:text-white text-xl md:text-2xl font-semibold focus:outline-none;
 }
-
 .info-item {
   @apply bg-white/5 border border-transparent flex flex-col items-start justify-center p-4 rounded-md;
 }
@@ -209,12 +272,10 @@ watch(vesStreetValue, (newVes: number | null) => {
 .info-value {
   @apply text-lg font-bold;
 }
-
 .highlight-card {
   position: relative;
   overflow: hidden;
 }
-
 .highlight-card::before {
   content: "";
   position: absolute;
@@ -229,17 +290,14 @@ watch(vesStreetValue, (newVes: number | null) => {
     transparent
   );
   transform: skewX(-25deg);
-
   animation: shimmer 10s infinite;
   animation-delay: 1s;
   transition: opacity 0.3s ease-in-out;
 }
-
 .highlight-card:focus-within::before {
   animation: none;
   opacity: 0;
 }
-
 @keyframes shimmer {
   100% {
     left: 150%;

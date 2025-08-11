@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { computed } from "vue";
 import { useClipboard } from "@vueuse/core";
 import { RatesSource, type ProcessedRate } from "~/api/types/bsRates";
 
@@ -7,6 +8,23 @@ const props = defineProps({
     type: Object as PropType<ProcessedRate | null>,
     required: true,
   },
+});
+
+const cardTitle = computed(() => {
+  if (!props.rateData?.source) {
+    return "Tasa no disponible";
+  }
+
+  switch (props.rateData.source) {
+    case RatesSource.Oficial:
+      return "Tasa Oficial (BCV)";
+    case RatesSource.Paralelo:
+      return "Tasa Paralela";
+    case RatesSource.Binance:
+      return "Tasa Binance P2P";
+    default:
+      return props.rateData.source;
+  }
 });
 
 const { copy, copied } = useClipboard({
@@ -18,11 +36,7 @@ const { copy, copied } = useClipboard({
 <template>
   <div class="w-full text-center">
     <h2 class="text-start text-sm sm:text-md font-medium text-light/50">
-      {{
-        rateData?.source === RatesSource.Oficial
-          ? "Tasa Oficial (BCV)"
-          : "Tasa Paralela"
-      }}
+      {{ cardTitle }}
     </h2>
 
     <div v-if="rateData" class="flex justify-start items-center gap-2">
@@ -43,7 +57,10 @@ const { copy, copied } = useClipboard({
       </button>
     </div>
 
-    <p v-if="rateData" class="text-end lg:text-start text-xs sm:text-sm font-light text-light/50">
+    <p
+      v-if="rateData"
+      class="text-end lg:text-start text-xs sm:text-sm font-light text-light/50"
+    >
       Actualizado:
       <b class="text-light font-bold">{{ formatDate(rateData.lastUpdate) }}</b>
     </p>

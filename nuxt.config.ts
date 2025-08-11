@@ -7,6 +7,8 @@ export default defineNuxtConfig({
   css: ["@/assets/css/global.css"],
 
   runtimeConfig: {
+    binanceP2pUrl: process.env.BINANCE_P2P_URL,
+
     public: {
       apiUrl: process.env.API_URL,
     },

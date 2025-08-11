@@ -2,6 +2,7 @@ export enum RatesSource {
   Oficial = "oficial",
   Paralelo = "paralelo",
   Bitcoin = "bitcoin",
+  Binance = "binance",
 }
 
 export interface BsRates {
@@ -14,7 +15,7 @@ export interface BsRates {
 }
 
 export interface ProcessedRate {
+  source: RatesSource;
   rate: number;
   lastUpdate: string;
-  source : RatesSource;
 }

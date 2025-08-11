@@ -12,8 +12,11 @@
   },
   "dependencies": {
     "@vueuse/core": "^13.6.0",
+    "axios": "^1.11.0",
+    "cheerio": "^1.1.2",
     "consulta-dolar-venezuela": "^1.1.2",
     "nuxt": "^4.0.1",
+    "puppeteer": "^24.16.1",
     "vue": "^3.5.18",
     "vue-router": "^4.5.1"
   },
