@@ -3,6 +3,7 @@ export default defineNuxtConfig({
   compatibilityDate: "2025-07-15",
   devtools: { enabled: false },
 
+  ssr: true,
   modules: ["@nuxtjs/tailwindcss", "@nuxt/icon"],
   css: ["@/assets/css/global.css"],
 
